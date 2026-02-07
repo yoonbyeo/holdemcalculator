@@ -1,0 +1,6 @@
+name = "holdem-sim"
+main = "src/index.js"
+compatibility_date = "2025-02-06"
+
+[assets]
+directory = "./public"

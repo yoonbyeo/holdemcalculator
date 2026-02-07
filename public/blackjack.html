@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>미니게임 허브</title>
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --panel: #11151c;
+      --panel-2: #151b24;
+      --text: #f3f0e8;
+      --muted: #b7b0a3;
+      --accent: #d7b468;
+      --accent-2: #f3d290;
+      --danger: #e06b6b;
+      --card: #0f141b;
+      --card-hi: #1a2230;
+      --border: rgba(220, 198, 140, 0.18);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      --glow: 0 0 36px rgba(215, 180, 104, 0.2);
+    }
+    [data-theme="light"] {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --panel-2: #f2f5f9;
+      --text: #1a2a33;
+      --muted: #5a6b76;
+      --accent: #1cbf86;
+      --accent-2: #42d5a4;
+      --danger: #d96b6b;
+      --card: #ffffff;
+      --card-hi: #f0f5f9;
+      --border: #d6e0e7;
+      --shadow: 0 10px 26px rgba(20, 36, 46, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Playfair Display", "Noto Serif KR", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background:
+        radial-gradient(700px 400px at 15% -10%, rgba(215, 180, 104, 0.15), transparent),
+        radial-gradient(900px 600px at 85% -10%, rgba(255, 240, 200, 0.08), transparent),
+        linear-gradient(180deg, #0a0c10 0%, #0d1016 100%);
+      color: var(--text);
+    }
+    [data-theme="light"] body {
+      background:
+        radial-gradient(900px 600px at 10% -10%, #dbe8f3, transparent),
+        radial-gradient(900px 600px at 90% 0%, #e9f2f8, transparent),
+        var(--bg);
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    h1 { margin: 0 0 6px 0; font-size: 26px; letter-spacing: 0.4px; }
+    .panel {
+      background: linear-gradient(180deg, rgba(17, 21, 28, 0.95), rgba(15, 18, 24, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+    .panel h2 { margin: 0 0 8px 0; font-size: 16px; color: var(--muted); }
+    .disclaimer {
+      background: linear-gradient(120deg, rgba(45, 32, 24, 0.9), rgba(55, 36, 26, 0.9));
+      color: #ffe8d6;
+      border: 1px solid rgba(245, 208, 122, 0.25);
+      padding: 10px 12px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+    }
+    [data-theme="light"] .disclaimer {
+      background: #fff1f1;
+      color: #7a2f2f;
+      border-color: #f0caca;
+    }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .pill {
+      display: inline-block;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    select, input, button {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+    button { cursor: pointer; font-weight: 700; }
+    button.primary {
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: #2a1c05;
+      border-color: rgba(215, 180, 104, 0.6);
+      box-shadow: var(--glow);
+    }
+    .stats {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    button.ghost { background: transparent; }
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .mini-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 8px;
+      font-weight: 800;
+      min-width: 36px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .red { color: #e35b5b; }
+    .mini-card.back {
+      background: repeating-linear-gradient(45deg, #1c2a33, #1c2a33 6px, #22323c 6px, #22323c 12px);
+      color: transparent;
+    }
+    .hand { display: flex; gap: 8px; flex-wrap: wrap; }
+    .status { font-size: 13px; color: var(--muted); }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .result-tag { font-weight: 800; }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+  <script>
+    document.getElementById('app').innerHTML = `
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>블랙잭</h1>
+        <div class="disclaimer">본 서비스는 학습/게임 분석용이며, 도박/금전 조언이 아닙니다.</div>
+      </div>
+    <div class="row">
+        <a class="pill" href="index.html">메인</a>
+        <a class="pill" href="holdem.html">승률 계산기</a>
+        <a class="pill" href="minigames.html">미니게임</a>
+        <a class="pill" href="policy.html">정책/고지</a>
+        <button class="toggle" id="themeToggle">테마: 다크</button>
+      </div>
+    </div>
+
+    <section class="panel grid" id="game-blackjack">
+      <div>
+        <h2><strong>블랙잭</strong> (가상 포인트)</h2>
+        <div class="status">현실 고증: 딜러는 홀카드를 뒤집어 두며, 플레이어 턴 종료 후 공개됩니다. 딜러는 소프트 17에서 스탠드합니다.</div>
+
+        <div class="row" style="margin-top:10px;">
+          <div class="chips">보유 포인트: <strong id="bjBalance">1000</strong></div>
+          <label for="bjBet">라운드 포인트</label>
+          <input id="bjBet" type="number" min="10" step="10" value="50" />
+          <button class="primary" id="bjDeal">스타트</button>
+          <button id="bjHit">히트</button>
+          <button id="bjStand">스탠드</button>
+          <button id="bjSplit">스플릿</button>
+          <button class="ghost" id="bjReveal">홀카드 오픈</button>
+        </div>
+        <div class="status" id="bjStake">라운드 포인트: -</div>
+
+        <div style="margin-top:12px;">
+          <div class="status">플레이어</div>
+          <div class="hand" id="bjPlayerHand0"></div>
+          <div class="status" id="bjPlayerValue0">합계: -</div>
+          <div class="hand" id="bjPlayerHand1" style="margin-top:8px;"></div>
+          <div class="status" id="bjPlayerValue1">합계: -</div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div class="status">딜러</div>
+          <div class="hand" id="bjDealerHand"></div>
+          <div class="status" id="bjDealerValue">합계: -</div>
+        </div>
+
+        <div class="status" id="bjStatus" style="margin-top:10px;">가상 포인트 기반의 참고용 게임입니다.</div>
+      </div>
+
+      <div>
+        <h2><strong>게임 결과</strong></h2>
+        <div class="status" id="bjResult">-</div>
+        <div class="status" style="margin-top:10px;">표시 규칙: Win/Lose/Push는 현재 게임 결과를 의미합니다.</div>
+        <div class="stats" style="margin-top:10px;" id="bjStats">플레이 수: 0 / Win: 0 / Lose: 0 / Push: 0</div>
+      </div>
+    </section>
+
+  </div>
+    `;
+  </script>
+<script>
+    // ===== 테마 토글 =====
+    const rootEl = document.documentElement;
+    const themeToggle = document.getElementById("themeToggle");
+    function setTheme(theme) {
+      rootEl.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+      themeToggle.textContent = `테마: ${theme === "light" ? "라이트" : "다크"}`;
+    }
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    setTheme(savedTheme);
+    themeToggle.onclick = () => {
+      const next = rootEl.getAttribute("data-theme") === "light" ? "dark" : "light";
+      setTheme(next);
+    };
+
+    // ===== 카드 유틸 =====
+    const SUITS = ["S", "H", "D", "C"];
+    const RANKS = ["2","3","4","5","6","7","8","9","T","J","Q","K","A"];
+    function makeDeck() {
+      const deck = [];
+      for (const s of SUITS) for (const r of RANKS) deck.push(r + s);
+      return deck;
+    }
+    function shuffleInPlace(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = (Math.random() * (i + 1)) | 0;
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+    function cardText(card) {
+      const r = card[0], s = card[1];
+      const suitSymbol = { S: "♠", H: "♥", D: "♦", C: "♣" }[s];
+      return r + suitSymbol;
+    }
+    function cardHTML(card) {
+      const s = card[1];
+      const red = (s === "H" || s === "D") ? "red" : "";
+      return `<span class="${red}">${cardText(card)}</span>`;
+    }
+
+    // ===== 블랙잭 =====
+    const bjBalanceEl = document.getElementById("bjBalance");
+    const bjBetEl = document.getElementById("bjBet");
+    const bjDeal = document.getElementById("bjDeal");
+    const bjHit = document.getElementById("bjHit");
+    const bjStand = document.getElementById("bjStand");
+    const bjSplit = document.getElementById("bjSplit");
+    const bjReveal = document.getElementById("bjReveal");
+    const bjStatus = document.getElementById("bjStatus");
+    const bjResult = document.getElementById("bjResult");
+    const bjStake = document.getElementById("bjStake");
+    const pHand0 = document.getElementById("bjPlayerHand0");
+    const pHand1 = document.getElementById("bjPlayerHand1");
+    const pVal0 = document.getElementById("bjPlayerValue0");
+    const pVal1 = document.getElementById("bjPlayerValue1");
+    const dHand = document.getElementById("bjDealerHand");
+    const dVal = document.getElementById("bjDealerValue");
+    const bjStatsEl = document.getElementById("bjStats");
+
+    let balance = 1000;
+    let deck = [];
+    let dealer = [];
+    let hands = [[], []];
+    let handBets = [0, 0];
+    let activeHand = 0;
+    let phase = "idle"; // idle | player | dealer | done
+    let holeHidden = true;
+    let revealIndex = 0;
+    let splitUsed = false;
+    let bjStats = { plays: 0, win: 0, lose: 0, push: 0 };
+
+    function handValue(hand) {
+      let sum = 0;
+      let aces = 0;
+      for (const c of hand) {
+        const r = c[0];
+        if (r === "A") { aces++; sum += 11; }
+        else if (["K","Q","J","T"].includes(r)) sum += 10;
+        else sum += Number(r);
+      }
+      while (sum > 21 && aces > 0) { sum -= 10; aces--; }
+      const soft = aces > 0;
+      return { sum, soft };
+    }
+
+    function renderHand(container, hand, hiddenLast=false) {
+      container.innerHTML = "";
+      for (let i = 0; i < hand.length; i++) {
+        const c = hand[i];
+        const el = document.createElement("div");
+        el.className = "mini-card";
+        if (hiddenLast && i >= revealIndex && holeHidden) {
+          el.classList.add("back");
+          el.textContent = "##";
+        } else {
+          el.innerHTML = cardHTML(c);
+        }
+        container.appendChild(el);
+      }
+    }
+
+    function render() {
+      renderHand(pHand0, hands[0]);
+      renderHand(pHand1, hands[1]);
+      renderHand(dHand, dealer, true);
+
+      const v0 = hands[0].length ? handValue(hands[0]).sum : "-";
+      const v1 = hands[1].length ? handValue(hands[1]).sum : "-";
+      const dv = dealer.length ? (holeHidden ? "?" : handValue(dealer).sum) : "-";
+      pVal0.textContent = `합계: ${v0}`;
+      pVal1.textContent = `합계: ${v1}`;
+      dVal.textContent = `합계: ${dv}`;
+
+      // active outline removed per request
+      updateAllBalances();
+      updateControls();
+    }
+    function updateAllBalances() {
+      bjBalanceEl.textContent = balance;
+    }
+
+    function updateControls() {
+      bjDeal.disabled = !(phase === "idle" || phase === "done");
+      bjHit.disabled = phase !== "player";
+      bjStand.disabled = phase !== "player";
+      bjSplit.disabled = !canSplit();
+      bjReveal.disabled = phase !== "dealer";
+    }
+
+    function canSplit() {
+      const h = hands[0];
+      if (splitUsed || phase !== "player") return false;
+      if (h.length !== 2) return false;
+      if (balance < handBets[0]) return false;
+      return h[0][0] === h[1][0];
+    }
+
+    function deal() {
+      const bet = Math.max(10, Number(bjBetEl.value) || 0);
+      if (bet > balance) {
+        bjStatus.textContent = "라운드 포인트가 보유 포인트를 초과했습니다.";
+        return;
+      }
+      deck = makeDeck();
+      shuffleInPlace(deck);
+      dealer = [deck.pop(), deck.pop()];
+      hands = [[deck.pop(), deck.pop()], []];
+      handBets = [bet, 0];
+      balance -= bet;
+      activeHand = 0;
+      phase = "player";
+      holeHidden = true;
+      revealIndex = 1; // 딜러 첫 장은 공개, 두 번째부터 숨김
+      splitUsed = false;
+      bjResult.textContent = "-";
+      bjStake.textContent = `라운드 포인트: ${bet}`;
+      bjStatus.textContent = "플레이어 턴입니다.";
+      render();
+    }
+
+    function hit() {
+      if (phase !== "player") return;
+      hands[activeHand].push(deck.pop());
+      const v = handValue(hands[activeHand]).sum;
+      if (v > 21) {
+        bjStatus.textContent = `핸드 ${activeHand+1}이 21을 초과했습니다.`;
+        if (activeHand === 0 && hands[1].length === 0) {
+          // 단일 핸드 버스트면 즉시 종료
+          holeHidden = false;
+          phase = "done";
+          bjResult.textContent = "핸드 1: Lose";
+          bjStatus.textContent = "플레이어 버스트로 게임 종료.";
+        } else {
+          nextHandOrDealer();
+        }
+      }
+      render();
+    }
+
+    function stand() {
+      if (phase !== "player") return;
+      nextHandOrDealer();
+    }
+
+    function nextHandOrDealer() {
+      if (activeHand === 0 && hands[1].length > 0) {
+        activeHand = 1;
+        bjStatus.textContent = "다음 핸드로 이동했습니다.";
+      } else {
+        phase = "dealer";
+        bjStatus.textContent = "딜러 턴입니다. 버튼을 눌러 홀카드부터 한 장씩 오픈하세요.";
+      }
+      render();
+    }
+
+    function split() {
+      if (!canSplit()) return;
+      splitUsed = true;
+      balance -= handBets[0];
+      handBets[1] = handBets[0];
+      const h = hands[0];
+      hands[1] = [h.pop()];
+      hands[0] = [h[0]];
+      hands[0].push(deck.pop());
+      hands[1].push(deck.pop());
+      activeHand = 0;
+      bjStatus.textContent = "스플릿 완료. 핸드 1부터 진행합니다.";
+      render();
+    }
+
+    function revealAndDealerPlay() {
+      if (phase !== "dealer") return;
+      // 1) 홀카드부터 한 장씩 공개
+      if (holeHidden && revealIndex < dealer.length) {
+        revealIndex++;
+        if (revealIndex >= dealer.length) holeHidden = false;
+        render();
+        return;
+      }
+      // 2) 공개 후 딜러가 히트해야 하면 한 장씩 진행
+      const dv = handValue(dealer);
+      if (dv.sum < 17) {
+        dealer.push(deck.pop());
+        render();
+        return;
+      }
+      // 3) 스탠드 조건이면 결과 계산
+      resolve();
+      render();
+    }
+
+    function resolve() {
+      const dv = handValue(dealer).sum;
+      const results = [];
+      for (let i = 0; i < 2; i++) {
+        if (hands[i].length === 0) continue;
+        const hv = handValue(hands[i]).sum;
+        const isBlackjack = hands[i].length === 2 && hv === 21 && !splitUsed;
+        if (hv > 21) {
+          results.push(`핸드 ${i+1}: Lose`);
+          bjStats.lose++;
+        } else if (dv > 21) {
+          balance += handBets[i] * 2;
+          results.push(`핸드 ${i+1}: Win`);
+          bjStats.win++;
+        } else if (isBlackjack && dv !== 21) {
+          balance += Math.floor(handBets[i] * 2.5);
+          results.push(`핸드 ${i+1}: Win (Blackjack)`);
+          bjStats.win++;
+        } else if (hv > dv) {
+          balance += handBets[i] * 2;
+          results.push(`핸드 ${i+1}: Win`);
+          bjStats.win++;
+        } else if (hv === dv) {
+          balance += handBets[i];
+          results.push(`핸드 ${i+1}: Push`);
+          bjStats.push++;
+        } else {
+          results.push(`핸드 ${i+1}: Lose`);
+          bjStats.lose++;
+        }
+        bjStats.plays++;
+      }
+      bjResult.textContent = results.join(" / ") || "-";
+      bjStatus.textContent = "게임이 종료되었습니다.";
+      phase = "done";
+      bjStatsEl.textContent = `플레이 수: ${bjStats.plays} / Win: ${bjStats.win} / Lose: ${bjStats.lose} / Push: ${bjStats.push}`;
+    }
+
+    bjDeal.onclick = deal;
+    bjHit.onclick = hit;
+    bjStand.onclick = stand;
+    bjSplit.onclick = split;
+    bjReveal.onclick = revealAndDealerPlay;
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>바카라</title>
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --panel: #11151c;
+      --panel-2: #151b24;
+      --text: #f3f0e8;
+      --muted: #b7b0a3;
+      --accent: #d7b468;
+      --accent-2: #f3d290;
+      --danger: #e06b6b;
+      --card: #0f141b;
+      --card-hi: #1a2230;
+      --border: rgba(220, 198, 140, 0.18);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      --glow: 0 0 36px rgba(215, 180, 104, 0.2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Playfair Display", "Noto Serif KR", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background:
+        radial-gradient(700px 400px at 15% -10%, rgba(215, 180, 104, 0.15), transparent),
+        radial-gradient(900px 600px at 85% -10%, rgba(255, 240, 200, 0.08), transparent),
+        linear-gradient(180deg, #0a0c10 0%, #0d1016 100%);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    h1 { margin: 0 0 6px 0; font-size: 26px; letter-spacing: 0.4px; }
+    .disclaimer {
+      background: linear-gradient(120deg, rgba(45, 32, 24, 0.9), rgba(55, 36, 26, 0.9));
+      color: #ffe8d6;
+      border: 1px solid rgba(245, 208, 122, 0.25);
+      padding: 10px 12px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+    }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .pill {
+      display: inline-block;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(17, 21, 28, 0.95), rgba(15, 18, 24, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    select, input, button {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+    button { cursor: pointer; font-weight: 700; }
+    button.primary {
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: #2a1c05;
+      border-color: rgba(215, 180, 104, 0.6);
+      box-shadow: var(--glow);
+    }
+    .hand { display: flex; gap: 8px; flex-wrap: wrap; }
+    .mini-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 8px;
+      font-weight: 800;
+      min-width: 36px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .mini-card.back {
+      background: repeating-linear-gradient(45deg, #1c2a33, #1c2a33 6px, #22323c 6px, #22323c 12px);
+      color: transparent;
+    }
+    .red { color: #e35b5b; }
+    .status { font-size: 13px; color: var(--muted); }
+    .stats { display: grid; gap: 6px; font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+  <script>
+    document.getElementById('app').innerHTML = `
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>바카라</h1>
+        <div class="disclaimer">본 서비스는 학습/게임 분석용이며, 도박/금전 조언이 아닙니다.</div>
+      </div>
+      <div class="row">
+        <a class="pill" href="index.html">메인</a>
+        <a class="pill" href="holdem.html">승률 계산기</a>
+        <a class="pill" href="minigames.html">미니게임</a>
+        <a class="pill" href="policy.html">정책/고지</a>
+      </div>
+    </div>
+
+    <section class="panel grid">
+      <div>
+        <h2><strong>바카라</strong> (가상 포인트)</h2>
+        <div class="status">플레이어/뱅커 중 승자를 예측합니다. 9에 가까운 쪽이 승리합니다.</div>
+        <div class="row" style="margin-top:10px;">
+          <div class="status">보유 포인트: <strong id="bacBalance">1000</strong></div>
+          <label for="bacBet">라운드 포인트</label>
+          <input id="bacBet" type="number" min="10" step="10" value="50" />
+          <button class="primary" id="bacPlayerBet">플레이어 선택</button>
+          <button id="bacBankerBet">뱅커 선택</button>
+          <button id="bacTieBet">타이 선택</button>
+          <button id="bacReveal">오픈</button>
+        </div>
+        <div style="margin-top:12px;">
+          <div class="status">플레이어</div>
+          <div class="hand" id="bacPlayerHand"></div>
+          <div class="status" id="bacPlayerValue">합계: -</div>
+        </div>
+        <div style="margin-top:12px;">
+          <div class="status">뱅커</div>
+          <div class="hand" id="bacBankerHand"></div>
+          <div class="status" id="bacBankerValue">합계: -</div>
+        </div>
+        <div class="status" id="bacStatus" style="margin-top:10px;">가상 포인트 기반의 참고용 게임입니다.</div>
+      </div>
+      <div>
+        <h2><strong>결과/히스토리</strong></h2>
+        <div class="status" id="bacResult">-</div>
+        <div class="status" style="margin-top:10px;">정산: 플레이어 x2, 뱅커 x1.95, 타이 x9 (가상 포인트)</div>
+        <div class="stats" style="margin-top:10px;" id="bacStats">플레이 수: 0 / Win: 0 / Lose: 0 / Push: 0</div>
+        <div class="stats" style="margin-top:10px;" id="bacHistory">히스토리: -</div>
+      </div>
+    </section>
+  </div>
+    `;
+  </script>
+<script>
+    // no language/theme toggles
+
+    const SUITS = ["S","H","D","C"];
+    const RANKS = ["2","3","4","5","6","7","8","9","T","J","Q","K","A"];
+    function makeDeck() {
+      const d = [];
+      for (const s of SUITS) for (const r of RANKS) d.push(r + s);
+      return d;
+    }
+    function shuffleInPlace(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = (Math.random() * (i + 1)) | 0;
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+    function cardText(card) {
+      const r = card[0], s = card[1];
+      const suitSymbol = { S:"♠", H:"♥", D:"♦", C:"♣" }[s];
+      return r + suitSymbol;
+    }
+    function cardHTML(card) {
+      const s = card[1];
+      const red = (s === "H" || s === "D") ? "red" : "";
+      return `<span class="${red}">${cardText(card)}</span>`;
+    }
+
+    const bacBalanceEl = document.getElementById("bacBalance");
+    const bacBetEl = document.getElementById("bacBet");
+    const bacPlayerBet = document.getElementById("bacPlayerBet");
+    const bacBankerBet = document.getElementById("bacBankerBet");
+    const bacTieBet = document.getElementById("bacTieBet");
+    const bacPlayerHand = document.getElementById("bacPlayerHand");
+    const bacBankerHand = document.getElementById("bacBankerHand");
+    const bacPlayerValue = document.getElementById("bacPlayerValue");
+    const bacBankerValue = document.getElementById("bacBankerValue");
+    const bacStatus = document.getElementById("bacStatus");
+    const bacResult = document.getElementById("bacResult");
+    const bacReveal = document.getElementById("bacReveal");
+    const bacStatsEl = document.getElementById("bacStats");
+    const bacHistoryEl = document.getElementById("bacHistory");
+
+    let bacBalance = 1000;
+    let bacStats = { plays: 0, win: 0, lose: 0, push: 0 };
+    let bacState = null;
+    let bacRevealCount = 0;
+    let history = [];
+
+    function bacCardValue(card) {
+      const r = card[0];
+      if (["K","Q","J","T"].includes(r)) return 0;
+      if (r === "A") return 1;
+      return Number(r);
+    }
+    function bacValue(hand) {
+      let sum = 0;
+      for (const c of hand) sum += bacCardValue(c);
+      return sum % 10;
+    }
+    function bacShownValue(hand, revealCount, who) {
+      if (!bacState) return "?";
+      const order = bacState.revealOrder;
+      let sum = 0;
+      for (let i = 0; i < hand.length; i++) {
+        const idx = order.findIndex(o => o.h === who && o.i === i);
+        if (idx > -1 && idx < revealCount) sum += bacCardValue(hand[i]);
+      }
+      return sum % 10;
+    }
+    function renderHand(container, hand, revealCount, who) {
+      container.innerHTML = "";
+      const order = bacState ? bacState.revealOrder : [];
+      for (let i = 0; i < hand.length; i++) {
+        const el = document.createElement("div");
+        el.className = "mini-card";
+        if (revealCount !== null) {
+          const idx = order.findIndex(o => o.h === who && o.i === i);
+          if (idx >= revealCount) {
+            el.classList.add("back");
+            el.textContent = "##";
+          } else {
+            el.innerHTML = cardHTML(hand[i]);
+          }
+        } else {
+          el.innerHTML = cardHTML(hand[i]);
+        }
+        container.appendChild(el);
+      }
+    }
+    function renderState() {
+      if (!bacState) return;
+      renderHand(bacPlayerHand, bacState.pHand, bacRevealCount, "p");
+      renderHand(bacBankerHand, bacState.bHand, bacRevealCount, "b");
+      if (bacRevealCount < bacState.revealOrder.length) {
+        bacPlayerValue.textContent = `합계: ${bacShownValue(bacState.pHand, bacRevealCount, "p")}`;
+        bacBankerValue.textContent = `합계: ${bacShownValue(bacState.bHand, bacRevealCount, "b")}`;
+      } else {
+        bacPlayerValue.textContent = `합계: ${bacValue(bacState.pHand)}`;
+        bacBankerValue.textContent = `합계: ${bacValue(bacState.bHand)}`;
+      }
+      bacBalanceEl.textContent = bacBalance;
+    }
+    function deal(betType) {
+      const bet = Math.max(10, Number(bacBetEl.value) || 0);
+      if (bet > bacBalance) {
+        bacStatus.textContent = "라운드 포인트가 보유 포인트를 초과했습니다.";
+        return;
+      }
+      const d = makeDeck();
+      shuffleInPlace(d);
+      bacBalance -= bet;
+      const pHand = [d.pop(), d.pop()];
+      const bHand = [d.pop(), d.pop()];
+      let pVal = bacValue(pHand);
+      let bVal = bacValue(bHand);
+      const natural = (pVal >= 8 || bVal >= 8);
+      let pThird = null;
+      if (!natural) {
+        if (pVal <= 5) {
+          pThird = d.pop();
+          pHand.push(pThird);
+          pVal = bacValue(pHand);
+        }
+        if (pThird === null) {
+          if (bVal <= 5) {
+            bHand.push(d.pop());
+          }
+        } else {
+          const pt = bacCardValue(pThird);
+          if (bVal <= 2) bHand.push(d.pop());
+          else if (bVal === 3 && pt !== 8) bHand.push(d.pop());
+          else if (bVal === 4 && pt >= 2 && pt <= 7) bHand.push(d.pop());
+          else if (bVal === 5 && pt >= 4 && pt <= 7) bHand.push(d.pop());
+          else if (bVal === 6 && (pt === 6 || pt === 7)) bHand.push(d.pop());
+        }
+      }
+      const pFinal = bacValue(pHand);
+      const bFinal = bacValue(bHand);
+      let winner = "tie";
+      if (pFinal > bFinal) winner = "player";
+      else if (bFinal > pFinal) winner = "banker";
+
+      let payout = 0;
+      if (betType === winner) {
+        if (winner === "player") payout = bet * 2;
+        else if (winner === "banker") payout = Math.floor(bet * 1.95);
+        else payout = bet * 9;
+        bacBalance += payout;
+      } else if (winner === "tie" && betType !== "tie") {
+        bacBalance += bet; // push
+      }
+
+      bacState = {
+        pHand, bHand, winner, betType, payout,
+        revealOrder: [
+          { h: "p", i: 0 },
+          { h: "b", i: 0 },
+          { h: "p", i: 1 },
+          { h: "b", i: 1 },
+          ...(pHand.length === 3 ? [{ h: "p", i: 2 }] : []),
+          ...(bHand.length === 3 ? [{ h: "b", i: 2 }] : []),
+        ]
+      };
+      bacRevealCount = 0;
+      bacResult.textContent = `결과: ${winner.toUpperCase()} / ${betType.toUpperCase()} 선택`;
+      bacStatus.textContent = "카드를 오픈하세요.";
+      renderState();
+    }
+    function finalize() {
+      const { winner, betType, payout } = bacState;
+      if (payout > 0) bacStats.win++;
+      else if (winner === "tie" && betType !== "tie") bacStats.push++;
+      else bacStats.lose++;
+      bacStats.plays++;
+      bacStatsEl.textContent = `플레이 수: ${bacStats.plays} / Win: ${bacStats.win} / Lose: ${bacStats.lose} / Push: ${bacStats.push}`;
+      const outcome = winner === "player" ? "P" : (winner === "banker" ? "B" : "T");
+      history.unshift(outcome);
+      history = history.slice(0, 12);
+      bacHistoryEl.textContent = `히스토리: ${history.join(" ")}`;
+      bacStatus.textContent = payout > 0 ? `Win! +${payout}포인트` : (winner === "tie" && betType !== "tie") ? "Push (포인트 반환)" : "Lose";
+      bacBalanceEl.textContent = bacBalance;
+    }
+    bacReveal.onclick = () => {
+      if (!bacState) return;
+      if (bacRevealCount < bacState.revealOrder.length) {
+        bacRevealCount++;
+        renderState();
+        if (bacRevealCount >= bacState.revealOrder.length) finalize();
+      }
+    };
+    bacPlayerBet.onclick = () => deal("player");
+    bacBankerBet.onclick = () => deal("banker");
+    bacTieBet.onclick = () => deal("tie");
+    bacBalanceEl.textContent = bacBalance;
+  </script>
+</body>
+</html>

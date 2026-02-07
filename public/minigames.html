@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>미니게임 모음</title>
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --panel: #11151c;
+      --panel-2: #151b24;
+      --text: #f3f0e8;
+      --muted: #b7b0a3;
+      --accent: #d7b468;
+      --accent-2: #f3d290;
+      --border: rgba(220, 198, 140, 0.18);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      --glow: 0 0 36px rgba(215, 180, 104, 0.2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Playfair Display", "Noto Serif KR", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background:
+        radial-gradient(700px 400px at 15% -10%, rgba(215, 180, 104, 0.15), transparent),
+        radial-gradient(900px 600px at 85% -10%, rgba(255, 240, 200, 0.08), transparent),
+        linear-gradient(180deg, #0a0c10 0%, #0d1016 100%);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    h1 { margin: 0 0 6px 0; font-size: 26px; letter-spacing: 0.4px; }
+    .disclaimer {
+      background: linear-gradient(120deg, rgba(45, 32, 24, 0.9), rgba(55, 36, 26, 0.9));
+      color: #ffe8d6;
+      border: 1px solid rgba(245, 208, 122, 0.25);
+      padding: 10px 12px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+    }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .pill {
+      display: inline-block;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(17, 21, 28, 0.95), rgba(15, 18, 24, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+    .card a {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 800;
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+  <script>
+    document.getElementById('app').innerHTML = `
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>미니게임 모음</h1>
+        <div class="disclaimer">본 서비스는 학습/게임 분석용이며, 도박/금전 조언이 아닙니다.</div>
+      </div>
+      <div class="row">
+        <a class="pill" href="index.html">메인</a>
+        <a class="pill" href="holdem.html">승률 계산기</a>
+        <a class="pill" href="minigames.html">미니게임</a>
+        <a class="pill" href="policy.html">정책/고지</a>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="muted">게임 선택</div>
+      <div class="cards" style="margin-top:10px;">
+        <div class="card">
+          <a href="blackjack.html">블랙잭</a>
+          <div class="muted">딜러 홀카드 오픈 방식, 스플릿 지원</div>
+        </div>
+        <div class="card">
+          <a href="baccarat.html">바카라</a>
+          <div class="muted">카드를 한 장씩 오픈하며 합계가 실시간 반영</div>
+        </div>
+      </div>
+    </section>
+  </div>
+    `;
+  </script>
+</body>
+</html>
