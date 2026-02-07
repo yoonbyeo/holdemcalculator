@@ -146,6 +146,7 @@
         <a class="pill" href="index.html">메인</a>
         <a class="pill" href="holdem.html">승률 계산기</a>
         <a class="pill" href="minigames.html">미니게임</a>
+        <a class="pill" href="leaderboard.html">레더보드</a>
         <a class="pill" href="policy.html">정책/고지</a>
         
       </div>
@@ -167,6 +168,12 @@
           <button class="ghost" id="bjReveal">홀카드 오픈</button>
         </div>
         <div class="status" id="bjStake">라운드 포인트: -</div>
+        <div class="row" style="margin-top:8px;">
+          <label for="bjName">닉네임</label>
+          <input id="bjName" type="text" maxlength="16" placeholder="익명" />
+          <button id="bjSubmit" class="primary">레더보드 등록</button>
+          <span class="status" id="bjSubmitStatus">-</span>
+        </div>
 
         <div style="margin-top:12px;">
           <div class="status">플레이어</div>
@@ -208,6 +215,13 @@
       </div>
     </section>
 
+    <section class="panel">
+      <h2><strong>학습 포인트</strong></h2>
+      <div class="status">A(에이스)는 상황에 따라 1 또는 11로 계산되어 결과에 큰 영향을 줍니다.</div>
+      <div class="status" style="margin-top:8px;">딜러 규칙이 고정되어 있어 결과 분포가 일정하게 수렴합니다.</div>
+      <div class="status" style="margin-top:8px;">포인트는 학습용 데이터이며 실제 가치가 없습니다.</div>
+    </section>
+
   </div>
     `;
   </script>
@@ -245,6 +259,9 @@
     const bjStand = document.getElementById("bjStand");
     const bjSplit = document.getElementById("bjSplit");
     const bjReveal = document.getElementById("bjReveal");
+    const bjName = document.getElementById("bjName");
+    const bjSubmit = document.getElementById("bjSubmit");
+    const bjSubmitStatus = document.getElementById("bjSubmitStatus");
     const bjStatus = document.getElementById("bjStatus");
     const bjResult = document.getElementById("bjResult");
     const bjStake = document.getElementById("bjStake");
@@ -316,6 +333,27 @@
     }
     function updateAllBalances() {
       bjBalanceEl.textContent = balance;
+      localStorage.setItem("lastScore", String(balance));
+      localStorage.setItem("lastGame", "blackjack");
+    }
+
+    async function submitScore() {
+      bjSubmitStatus.textContent = "등록 중...";
+      try {
+        const res = await fetch("/api/leaderboard", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            name: bjName.value.trim(),
+            game: "blackjack",
+            score: balance
+          })
+        });
+        if (!res.ok) throw new Error("bad");
+        bjSubmitStatus.textContent = "등록 완료";
+      } catch {
+        bjSubmitStatus.textContent = "등록 실패 (배포 후 이용 가능)";
+      }
     }
 
     function updateControls() {
@@ -471,6 +509,7 @@
     bjStand.onclick = stand;
     bjSplit.onclick = split;
     bjReveal.onclick = revealAndDealerPlay;
+    bjSubmit.onclick = submitScore;
 
     render();
   </script>

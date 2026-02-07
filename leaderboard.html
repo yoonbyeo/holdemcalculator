@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>레더보드</title>
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --panel: #11151c;
+      --panel-2: #151b24;
+      --text: #f3f0e8;
+      --muted: #b7b0a3;
+      --accent: #d7b468;
+      --accent-2: #f3d290;
+      --border: rgba(220, 198, 140, 0.18);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      --glow: 0 0 36px rgba(215, 180, 104, 0.2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Playfair Display", "Noto Serif KR", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background:
+        radial-gradient(700px 400px at 15% -10%, rgba(215, 180, 104, 0.15), transparent),
+        radial-gradient(900px 600px at 85% -10%, rgba(255, 240, 200, 0.08), transparent),
+        linear-gradient(180deg, #0a0c10 0%, #0d1016 100%);
+      color: var(--text);
+    }
+    .wrap {
+      width: min(1200px, 100% - 32px);
+      margin: 0 auto;
+      padding: 20px 0;
+      display: grid;
+      gap: 16px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    h1 { margin: 0 0 6px 0; font-size: 26px; letter-spacing: 0.4px; }
+    .disclaimer {
+      background: linear-gradient(120deg, rgba(45, 32, 24, 0.9), rgba(55, 36, 26, 0.9));
+      color: #ffe8d6;
+      border: 1px solid rgba(245, 208, 122, 0.25);
+      padding: 10px 12px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+    }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .pill {
+      display: inline-block;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(17, 21, 28, 0.95), rgba(15, 18, 24, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    select, input, button {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+    button { cursor: pointer; font-weight: 700; }
+    button.primary {
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: #2a1c05;
+      border-color: rgba(215, 180, 104, 0.6);
+      box-shadow: var(--glow);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border-bottom: 1px solid var(--border); padding: 10px 6px; text-align: left; }
+    th { color: var(--muted); font-weight: 600; }
+    .status { font-size: 13px; color: var(--muted); }
+    .note { color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>레더보드</h1>
+        <div class="disclaimer">본 서비스는 교육/게임 메커니즘 이해를 위한 시뮬레이션이며, 실제 금전 거래/보상과 무관합니다.</div>
+      </div>
+      <div class="row">
+        <a class="pill" href="index.html">메인</a>
+        <a class="pill" href="holdem.html">승률 계산기</a>
+        <a class="pill" href="minigames.html">미니게임</a>
+        <a class="pill" href="policy.html">정책/고지</a>
+      </div>
+    </div>
+
+    <section class="panel grid">
+      <div>
+        <h2><strong>기록 등록 안내</strong></h2>
+        <div class="status">레더보드 등록은 각 게임 화면에서 닉네임 입력 후 진행됩니다.</div>
+        <div class="note" style="margin-top:8px;">점수는 게임 내 보유 포인트를 기준으로 자동 연동됩니다.</div>
+        <div class="note" style="margin-top:8px;">모든 포인트는 가상 데이터이며 실제 가치가 없습니다.</div>
+      </div>
+      <div>
+        <h2><strong>필터</strong></h2>
+        <div class="row" style="margin-top:10px;">
+          <label for="lbFilter">게임 필터</label>
+          <select id="lbFilter">
+            <option value="all">전체</option>
+            <option value="holdem">홀덤</option>
+            <option value="blackjack">블랙잭</option>
+            <option value="baccarat">바카라</option>
+            <option value="slots">슬롯</option>
+          </select>
+          <button id="lbRefresh">새로고침</button>
+        </div>
+        <div class="status" id="lbStatus" style="margin-top:8px;">-</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2><strong>순위</strong></h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>닉네임</th>
+            <th>게임</th>
+            <th>점수</th>
+            <th>기록 시각</th>
+          </tr>
+        </thead>
+        <tbody id="lbBody">
+          <tr><td colspan="5" class="status">불러오는 중...</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    const lbFilter = document.getElementById("lbFilter");
+    const lbRefresh = document.getElementById("lbRefresh");
+    const lbBody = document.getElementById("lbBody");
+    const lbStatus = document.getElementById("lbStatus");
+
+    function fmtTime(ts) {
+      const d = new Date(ts);
+      return d.toLocaleString();
+    }
+
+    async function loadBoard() {
+      const game = lbFilter.value;
+      const qs = game === "all" ? "" : `?game=${encodeURIComponent(game)}`;
+      lbStatus.textContent = "불러오는 중...";
+      let data = { items: [] };
+      try {
+        const res = await fetch(`/api/leaderboard${qs}`);
+        data = await res.json();
+      } catch {
+        lbStatus.textContent = "서버 연결 실패 (배포 후 이용 가능)";
+        lbBody.innerHTML = '<tr><td colspan="5" class="status">불러올 수 없습니다.</td></tr>';
+        return;
+      }
+      const items = data.items || [];
+      lbBody.innerHTML = "";
+      if (!items.length) {
+        lbBody.innerHTML = '<tr><td colspan="5" class="status">기록이 없습니다.</td></tr>';
+      } else {
+        items.forEach((it, idx) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${idx + 1}</td><td></td><td>${it.game}</td><td>${it.score}</td><td>${fmtTime(it.ts)}</td>`;
+          tr.children[1].textContent = it.name;
+          lbBody.appendChild(tr);
+        });
+      }
+      lbStatus.textContent = `표시 중: ${items.length}개`;
+    }
+
+    lbRefresh.onclick = loadBoard;
+    lbFilter.onchange = loadBoard;
+    loadBoard();
+  </script>
+</body>
+</html>

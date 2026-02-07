@@ -124,6 +124,7 @@
         <a class="pill" href="index.html">메인</a>
         <a class="pill" href="holdem.html">승률 계산기</a>
         <a class="pill" href="minigames.html">미니게임</a>
+        <a class="pill" href="leaderboard.html">레더보드</a>
         <a class="pill" href="policy.html">정책/고지</a>
       </div>
     </div>
@@ -141,6 +142,12 @@
           <button id="bacBankerBet">뱅커 선택</button>
           <button id="bacTieBet">타이 선택</button>
           <button id="bacReveal">오픈</button>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <label for="bacName">닉네임</label>
+          <input id="bacName" type="text" maxlength="16" placeholder="익명" />
+          <button id="bacSubmit" class="primary">레더보드 등록</button>
+          <span class="status" id="bacSubmitStatus">-</span>
         </div>
         <div style="margin-top:12px;">
           <div class="status">플레이어</div>
@@ -176,6 +183,13 @@
       <div class="status" style="margin-top:10px;">
         본 게임은 가상 포인트 기반의 시뮬레이션이며, 실제 금전 가치가 없습니다.
       </div>
+    </section>
+
+    <section class="panel">
+      <h2><strong>학습 포인트</strong></h2>
+      <div class="status">합계는 항상 0~9 범위로 순환하며 작은 변화가 결과를 바꿀 수 있습니다.</div>
+      <div class="status" style="margin-top:8px;">세 번째 카드 규칙은 확률 분포에 영향을 줍니다.</div>
+      <div class="status" style="margin-top:8px;">표본 수가 늘수록 결과 비율이 안정됩니다.</div>
     </section>
   </div>
     `;
@@ -218,6 +232,9 @@
     const bacBankerValue = document.getElementById("bacBankerValue");
     const bacStatus = document.getElementById("bacStatus");
     const bacResult = document.getElementById("bacResult");
+    const bacName = document.getElementById("bacName");
+    const bacSubmit = document.getElementById("bacSubmit");
+    const bacSubmitStatus = document.getElementById("bacSubmitStatus");
     const bacReveal = document.getElementById("bacReveal");
     const bacStatsEl = document.getElementById("bacStats");
     const bacHistoryEl = document.getElementById("bacHistory");
@@ -282,6 +299,27 @@
         bacBankerValue.textContent = `합계: ${bacValue(bacState.bHand)}`;
       }
       bacBalanceEl.textContent = bacBalance;
+      localStorage.setItem("lastScore", String(bacBalance));
+      localStorage.setItem("lastGame", "baccarat");
+    }
+
+    async function submitScore() {
+      bacSubmitStatus.textContent = "등록 중...";
+      try {
+        const res = await fetch("/api/leaderboard", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            name: bacName.value.trim(),
+            game: "baccarat",
+            score: bacBalance
+          })
+        });
+        if (!res.ok) throw new Error("bad");
+        bacSubmitStatus.textContent = "등록 완료";
+      } catch {
+        bacSubmitStatus.textContent = "등록 실패 (배포 후 이용 가능)";
+      }
     }
     function deal(betType) {
       const bet = Math.max(10, Number(bacBetEl.value) || 0);
@@ -376,6 +414,7 @@
     bacPlayerBet.onclick = () => deal("player");
     bacBankerBet.onclick = () => deal("banker");
     bacTieBet.onclick = () => deal("tie");
+    bacSubmit.onclick = submitScore;
     bacBalanceEl.textContent = bacBalance;
   </script>
 </body>

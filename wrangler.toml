@@ -4,3 +4,8 @@ compatibility_date = "2025-02-06"
 
 [assets]
 directory = "./public"
+
+[[kv_namespaces]]
+binding = "LEADERBOARD"
+id = "REPLACE_WITH_KV_ID"
+preview_id = "REPLACE_WITH_KV_PREVIEW_ID"

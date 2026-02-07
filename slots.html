@@ -137,6 +137,7 @@
         <a class="pill" href="index.html">메인</a>
         <a class="pill" href="holdem.html">승률 계산기</a>
         <a class="pill" href="minigames.html">미니게임</a>
+        <a class="pill" href="leaderboard.html">레더보드</a>
         <a class="pill" href="policy.html">정책/고지</a>
       </div>
     </div>
@@ -150,6 +151,12 @@
           <label for="slotBet">라운드 포인트</label>
           <input id="slotBet" type="number" min="10" step="10" value="20" />
           <button class="primary" id="slotSpin">스핀</button>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <label for="slotName">닉네임</label>
+          <input id="slotName" type="text" maxlength="16" placeholder="익명" />
+          <button id="slotSubmit" class="primary">레더보드 등록</button>
+          <span class="status" id="slotSubmitStatus">-</span>
         </div>
         <div class="slot-wrap" id="slotWrap">
           <svg class="slot-lines" id="slotLines"></svg>
@@ -168,6 +175,13 @@
         <div class="status" style="margin-top:10px;">🍒 x2 / 🍋 x3 / 🔔 x5 / ⭐ x7 / 7️⃣ x12 (가상 포인트)</div>
       </div>
     </section>
+
+    <section class="panel">
+      <h2><strong>학습 포인트</strong></h2>
+      <div class="status">여러 라인이 동시에 일치할 수 있어 결과 분산이 커질 수 있습니다.</div>
+      <div class="status" style="margin-top:8px;">심볼 종류가 늘수록 특정 라인 일치 확률이 변화합니다.</div>
+      <div class="status" style="margin-top:8px;">포인트는 학습용 데이터이며 실제 가치가 없습니다.</div>
+    </section>
   </div>
 
   <script>
@@ -176,6 +190,9 @@
     const slotBalanceEl = document.getElementById("slotBalance");
     const slotBetEl = document.getElementById("slotBet");
     const slotSpin = document.getElementById("slotSpin");
+    const slotName = document.getElementById("slotName");
+    const slotSubmit = document.getElementById("slotSubmit");
+    const slotSubmitStatus = document.getElementById("slotSubmitStatus");
     const slotWrap = document.getElementById("slotWrap");
     const slotLines = document.getElementById("slotLines");
     const slotGrid = Array.from(document.querySelectorAll(".slot-cell"));
@@ -186,7 +203,29 @@
     function randSym() {
       return slotSymbols[(Math.random()*slotSymbols.length)|0];
     }
-    function renderBalance() { slotBalanceEl.textContent = balance; }
+    function renderBalance() {
+      slotBalanceEl.textContent = balance;
+      localStorage.setItem("lastScore", String(balance));
+      localStorage.setItem("lastGame", "slots");
+    }
+    async function submitScore() {
+      slotSubmitStatus.textContent = "등록 중...";
+      try {
+        const res = await fetch("/api/leaderboard", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            name: slotName.value.trim(),
+            game: "slots",
+            score: balance
+          })
+        });
+        if (!res.ok) throw new Error("bad");
+        slotSubmitStatus.textContent = "등록 완료";
+      } catch {
+        slotSubmitStatus.textContent = "등록 실패 (배포 후 이용 가능)";
+      }
+    }
     function resetLines() {
       slotGrid.forEach(c => c.classList.remove("win"));
       slotLines.innerHTML = "";
@@ -267,6 +306,7 @@
       }, 80);
     }
     slotSpin.onclick = spin;
+    slotSubmit.onclick = submitScore;
     renderBalance();
   </script>
 </body>
