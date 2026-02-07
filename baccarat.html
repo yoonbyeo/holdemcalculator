@@ -111,6 +111,9 @@
   </style>
 </head>
 <body>
+<div id="app"></div>
+  <script>
+    document.getElementById('app').innerHTML = `
   <div class="wrap">
     <div class="topbar">
       <div>
@@ -159,8 +162,9 @@
       </div>
     </section>
   </div>
-
-  <script>
+    `;
+  </script>
+<script>
     // no language/theme toggles
 
     const SUITS = ["S","H","D","C"];

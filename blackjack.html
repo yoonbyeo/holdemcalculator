@@ -158,6 +158,9 @@
   </style>
 </head>
 <body>
+<div id="app"></div>
+  <script>
+    document.getElementById('app').innerHTML = `
   <div class="wrap">
     <div class="topbar">
       <div>
@@ -216,8 +219,9 @@
     </section>
 
   </div>
-
-  <script>
+    `;
+  </script>
+<script>
     // ===== 테마 토글 =====
     const rootEl = document.documentElement;
     const themeToggle = document.getElementById("themeToggle");
