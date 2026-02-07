@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>미니 카지노</title>
+  <title>미니게임 모음</title>
   <style>
     :root {
       --bg: #0a0c10;
@@ -17,17 +17,6 @@
       --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
       --glow: 0 0 36px rgba(215, 180, 104, 0.2);
     }
-    [data-theme="light"] {
-      --bg: #f5f7fb;
-      --panel: #ffffff;
-      --panel-2: #f2f5f9;
-      --text: #1a2a33;
-      --muted: #5a6b76;
-      --accent: #1cbf86;
-      --accent-2: #42d5a4;
-      --border: #d6e0e7;
-      --shadow: 0 10px 26px rgba(20, 36, 46, 0.12);
-    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -37,12 +26,6 @@
         radial-gradient(900px 600px at 85% -10%, rgba(255, 240, 200, 0.08), transparent),
         linear-gradient(180deg, #0a0c10 0%, #0d1016 100%);
       color: var(--text);
-    }
-    [data-theme="light"] body {
-      background:
-        radial-gradient(900px 600px at 10% -10%, #dbe8f3, transparent),
-        radial-gradient(900px 600px at 90% 0%, #e9f2f8, transparent),
-        var(--bg);
     }
     .wrap {
       max-width: 1000px;
@@ -68,11 +51,6 @@
       box-shadow: var(--shadow);
       font-size: 14px;
     }
-    [data-theme="light"] .disclaimer {
-      background: #fff1f1;
-      color: #7a2f2f;
-      border-color: #f0caca;
-    }
     .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .pill {
       display: inline-block;
@@ -83,18 +61,6 @@
       font-size: 13px;
       color: var(--muted);
       text-decoration: none;
-    }
-    .toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      font-size: 13px;
-      color: var(--muted);
-      cursor: pointer;
     }
     .panel {
       background: linear-gradient(180deg, rgba(17, 21, 28, 0.95), rgba(15, 18, 24, 0.95));
@@ -129,7 +95,7 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h1>미니 카지노</h1>
+        <h1>미니게임 모음</h1>
         <div class="disclaimer">본 서비스는 학습/게임 분석용이며, 도박/금전 조언이 아닙니다.</div>
       </div>
       <div class="row">
@@ -137,39 +103,22 @@
         <a class="pill" href="holdem.html">승률 계산기</a>
         <a class="pill" href="minigames.html">미니게임</a>
         <a class="pill" href="policy.html">정책/고지</a>
-        <button class="toggle" id="themeToggle">테마: 다크</button>
       </div>
     </div>
 
     <section class="panel">
-      <div class="muted">학습/참고용 도구 모음</div>
+      <div class="muted">게임 선택</div>
       <div class="cards" style="margin-top:10px;">
         <div class="card">
-          <a href="holdem.html">텍사스 홀덤 승률 계산기</a>
-          <div class="muted">Monte Carlo 시뮬레이션 기반 승률 추정과 보드 텍스처 분석.</div>
+          <a href="blackjack.html">블랙잭</a>
+          <div class="muted">딜러 홀카드 오픈 방식, 스플릿 지원</div>
         </div>
         <div class="card">
-          <a href="minigames.html">미니게임</a>
-          <div class="muted">가상 포인트 기반의 미니게임.</div>
+          <a href="baccarat.html">바카라</a>
+          <div class="muted">카드를 한 장씩 오픈하며 합계가 실시간 반영</div>
         </div>
       </div>
     </section>
   </div>
-
-  <script>
-    const rootEl = document.documentElement;
-    const themeToggle = document.getElementById("themeToggle");
-    function setTheme(theme) {
-      rootEl.setAttribute("data-theme", theme);
-      localStorage.setItem("theme", theme);
-      themeToggle.textContent = `테마: ${theme === "light" ? "라이트" : "다크"}`;
-    }
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    setTheme(savedTheme);
-    themeToggle.onclick = () => {
-      const next = rootEl.getAttribute("data-theme") === "light" ? "dark" : "light";
-      setTheme(next);
-    };
-  </script>
 </body>
 </html>
