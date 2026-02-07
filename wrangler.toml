@@ -1,4 +1,4 @@
-name = "holdem-sim"
+name = "holdemcalculator"
 main = "src/index.js"
 compatibility_date = "2025-02-06"
 
