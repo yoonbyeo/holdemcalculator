@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-theme="dark">
+<html lang="ko">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,20 +20,6 @@
       --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
       --glow: 0 0 36px rgba(215, 180, 104, 0.2);
     }
-    [data-theme="light"] {
-      --bg: #f5f7fb;
-      --panel: #ffffff;
-      --panel-2: #f2f5f9;
-      --text: #1a2a33;
-      --muted: #5a6b76;
-      --accent: #1cbf86;
-      --accent-2: #42d5a4;
-      --danger: #d96b6b;
-      --card: #ffffff;
-      --card-hi: #f0f5f9;
-      --border: #d6e0e7;
-      --shadow: 0 10px 26px rgba(20, 36, 46, 0.12);
-    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -43,12 +29,6 @@
         radial-gradient(900px 600px at 85% -10%, rgba(255, 240, 200, 0.08), transparent),
         linear-gradient(180deg, #0a0c10 0%, #0d1016 100%);
       color: var(--text);
-    }
-    [data-theme="light"] body {
-      background:
-        radial-gradient(900px 600px at 10% -10%, #dbe8f3, transparent),
-        radial-gradient(900px 600px at 90% 0%, #e9f2f8, transparent),
-        var(--bg);
     }
     .wrap {
       width: min(1200px, 100% - 32px);
@@ -82,11 +62,6 @@
       border-radius: 12px;
       box-shadow: var(--shadow);
       font-size: 14px;
-    }
-    [data-theme="light"] .disclaimer {
-      background: #fff1f1;
-      color: #7a2f2f;
-      border-color: #f0caca;
     }
     .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .pill {
@@ -172,7 +147,7 @@
         <a class="pill" href="holdem.html">승률 계산기</a>
         <a class="pill" href="minigames.html">미니게임</a>
         <a class="pill" href="policy.html">정책/고지</a>
-        <button class="toggle" id="themeToggle">테마: 다크</button>
+        
       </div>
     </div>
 
@@ -218,25 +193,25 @@
       </div>
     </section>
 
+    <section class="panel">
+      <h2><strong>게임 규칙</strong></h2>
+      <div class="status">
+        카드 합계가 21에 가까울수록 유리합니다. 21을 초과하면 해당 라운드는 종료됩니다.
+        숫자 카드는 표시된 값, J/Q/K는 10, A는 1 또는 11로 계산됩니다.
+      </div>
+      <div class="status" style="margin-top:10px;">
+        딜러는 홀카드를 보유하며 플레이어 턴 종료 후 공개됩니다.
+        딜러는 소프트 17에서 멈춥니다. 스플릿은 동일한 랭크일 때 가능합니다.
+      </div>
+      <div class="status" style="margin-top:10px;">
+        본 게임은 가상 포인트 기반의 시뮬레이션이며, 실제 금전 가치가 없습니다.
+      </div>
+    </section>
+
   </div>
     `;
   </script>
 <script>
-    // ===== 테마 토글 =====
-    const rootEl = document.documentElement;
-    const themeToggle = document.getElementById("themeToggle");
-    function setTheme(theme) {
-      rootEl.setAttribute("data-theme", theme);
-      localStorage.setItem("theme", theme);
-      themeToggle.textContent = `테마: ${theme === "light" ? "라이트" : "다크"}`;
-    }
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    setTheme(savedTheme);
-    themeToggle.onclick = () => {
-      const next = rootEl.getAttribute("data-theme") === "light" ? "dark" : "light";
-      setTheme(next);
-    };
-
     // ===== 카드 유틸 =====
     const SUITS = ["S", "H", "D", "C"];
     const RANKS = ["2","3","4","5","6","7","8","9","T","J","Q","K","A"];

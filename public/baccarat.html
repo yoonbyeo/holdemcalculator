@@ -132,6 +132,7 @@
       <div>
         <h2><strong>바카라</strong> (가상 포인트)</h2>
         <div class="status">플레이어/뱅커 중 승자를 예측합니다. 9에 가까운 쪽이 승리합니다.</div>
+        <div class="status" id="bacPick" style="margin-top:6px;">현재 선택: -</div>
         <div class="row" style="margin-top:10px;">
           <div class="status">보유 포인트: <strong id="bacBalance">1000</strong></div>
           <label for="bacBet">라운드 포인트</label>
@@ -141,7 +142,6 @@
           <button id="bacTieBet">타이 선택</button>
           <button id="bacReveal">오픈</button>
         </div>
-        <div class="status" id="bacPick" style="margin-top:6px;">현재 선택: -</div>
         <div style="margin-top:12px;">
           <div class="status">플레이어</div>
           <div class="hand" id="bacPlayerHand"></div>
@@ -160,6 +160,21 @@
         <div class="status" style="margin-top:10px;">정산: 플레이어 x2, 뱅커 x1.95, 타이 x9 (가상 포인트)</div>
         <div class="stats" style="margin-top:10px;" id="bacStats">플레이 수: 0 / Win: 0 / Lose: 0 / Push: 0</div>
         <div class="stats" style="margin-top:10px;" id="bacHistory">히스토리: -</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2><strong>게임 규칙</strong></h2>
+      <div class="status">
+        플레이어와 뱅커 중 합계가 9에 가까운 쪽이 결과로 표시됩니다.
+        10 이상은 자리수만 사용하며(예: 15 → 5), A는 1, 10/J/Q/K는 0으로 계산됩니다.
+      </div>
+      <div class="status" style="margin-top:10px;">
+        세 번째 카드는 정해진 규칙에 따라 자동으로 추가됩니다.
+        본 화면에서는 카드를 한 장씩 공개하여 합계가 실시간으로 반영됩니다.
+      </div>
+      <div class="status" style="margin-top:10px;">
+        본 게임은 가상 포인트 기반의 시뮬레이션이며, 실제 금전 가치가 없습니다.
       </div>
     </section>
   </div>

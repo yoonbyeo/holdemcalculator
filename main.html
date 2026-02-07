@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ko" data-theme="dark">
+<html lang="ko">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>미니 카지노</title>
+  <title>확률 기반 카드 게임 시뮬레이터</title>
   <style>
     :root {
       --bg: #0a0c10;
@@ -17,17 +17,6 @@
       --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
       --glow: 0 0 36px rgba(215, 180, 104, 0.2);
     }
-    [data-theme="light"] {
-      --bg: #f5f7fb;
-      --panel: #ffffff;
-      --panel-2: #f2f5f9;
-      --text: #1a2a33;
-      --muted: #5a6b76;
-      --accent: #1cbf86;
-      --accent-2: #42d5a4;
-      --border: #d6e0e7;
-      --shadow: 0 10px 26px rgba(20, 36, 46, 0.12);
-    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -37,12 +26,6 @@
         radial-gradient(900px 600px at 85% -10%, rgba(255, 240, 200, 0.08), transparent),
         linear-gradient(180deg, #0a0c10 0%, #0d1016 100%);
       color: var(--text);
-    }
-    [data-theme="light"] body {
-      background:
-        radial-gradient(900px 600px at 10% -10%, #dbe8f3, transparent),
-        radial-gradient(900px 600px at 90% 0%, #e9f2f8, transparent),
-        var(--bg);
     }
     .wrap {
       width: min(1200px, 100% - 32px);
@@ -67,11 +50,6 @@
       border-radius: 12px;
       box-shadow: var(--shadow);
       font-size: 14px;
-    }
-    [data-theme="light"] .disclaimer {
-      background: #fff1f1;
-      color: #7a2f2f;
-      border-color: #f0caca;
     }
     .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .pill {
@@ -104,6 +82,64 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(6px);
     }
+    .hero {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      align-items: stretch;
+    }
+    .hero-card {
+      background: linear-gradient(145deg, rgba(20, 25, 34, 0.98), rgba(15, 18, 24, 0.98));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      display: grid;
+      gap: 10px;
+      min-height: 180px;
+      box-shadow: var(--shadow);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(215, 180, 104, 0.12);
+      border: 1px solid rgba(215, 180, 104, 0.3);
+      color: var(--accent-2);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+    .stat {
+      padding: 12px;
+      border-radius: 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      display: grid;
+      gap: 4px;
+    }
+    .stat strong { font-size: 18px; }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(215, 180, 104, 0.35);
+      background: linear-gradient(120deg, rgba(215, 180, 104, 0.22), rgba(215, 180, 104, 0.08));
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+    }
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -132,48 +168,90 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h1>미니 카지노</h1>
-        <div class="disclaimer">본 서비스는 학습/게임 분석용이며, 도박/금전 조언이 아닙니다.</div>
+        <h1>확률 기반 카드 게임 시뮬레이터</h1>
+        <div class="disclaimer">본 서비스는 교육/게임 메커니즘 이해를 위한 시뮬레이션이며, 실제 금전 거래/도박/베팅과 무관합니다.</div>
       </div>
       <div class="row">
         <a class="pill" href="index.html">메인</a>
         <a class="pill" href="holdem.html">승률 계산기</a>
         <a class="pill" href="minigames.html">미니게임</a>
         <a class="pill" href="policy.html">정책/고지</a>
-        <button class="toggle" id="themeToggle">테마: 다크</button>
+        
       </div>
     </div>
 
     <section class="panel">
-      <div class="muted">학습/참고용 도구 모음</div>
-      <div class="cards" style="margin-top:10px;">
+      <div class="hero">
+        <div class="hero-card">
+          <span class="badge">교육/시뮬레이션</span>
+          <h2 style="margin:0;">게임 확률과 메커니즘을 눈으로 확인하세요</h2>
+          <div class="muted">모든 결과는 가상 포인트 기반이며, 실제 금전 가치가 없습니다.</div>
+          <div class="row">
+            <a class="cta" href="holdem.html">승률 계산기</a>
+            <a class="cta" href="minigames.html">미니게임 모음</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="muted">핵심 원칙</div>
+          <div class="stats">
+            <div class="stat">
+              <strong>100% 가상</strong>
+              <div class="muted">실제 금전/환전 없음</div>
+            </div>
+            <div class="stat">
+              <strong>확률 기반</strong>
+              <div class="muted">무작위성/분산 학습</div>
+            </div>
+            <div class="stat">
+              <strong>중립적 안내</strong>
+              <div class="muted">행동 추천 없음</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="muted">도구 안내</div>
+      <div class="grid-3" style="margin-top:10px;">
         <div class="card">
           <a href="holdem.html">텍사스 홀덤 승률 계산기</a>
-          <div class="muted">Monte Carlo 시뮬레이션 기반 승률 추정과 보드 텍스처 분석.</div>
+          <div class="muted">Monte Carlo 시뮬레이션으로 Win/Tie/Lose 확률을 추정하고 보드 텍스처를 분석합니다.</div>
         </div>
         <div class="card">
-          <a href="minigames.html">미니게임</a>
-          <div class="muted">가상 포인트 기반의 미니게임.</div>
+          <a href="blackjack.html">블랙잭</a>
+          <div class="muted">딜러 홀카드 오픈을 단계적으로 진행하며 점수 합계를 확인합니다.</div>
+        </div>
+        <div class="card">
+          <a href="baccarat.html">바카라</a>
+          <div class="muted">카드를 한 장씩 공개하며 합계가 즉시 반영됩니다.</div>
+        </div>
+        <div class="card">
+          <a href="slots.html">슬롯 머신</a>
+          <div class="muted">3x3 심볼을 회전시키는 가상 포인트 게임입니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="muted">학습 포인트</div>
+      <div class="cards" style="margin-top:10px;">
+        <div class="card">
+          <div>확률은 고정값이 아니라 표본 수에 따라 변동합니다.</div>
+          <div class="muted">Trials가 많을수록 결과는 안정적으로 수렴합니다.</div>
+        </div>
+        <div class="card">
+          <div>무작위성은 결과의 예측 불확실성을 높입니다.</div>
+          <div class="muted">짧은 연속 결과는 일반화하기 어렵습니다.</div>
+        </div>
+        <div class="card">
+          <div>본 사이트는 행동 권유 없이 결과를 중립적으로 표시합니다.</div>
+          <div class="muted">결정은 사용자 책임이며, 실제 금전 거래와 무관합니다.</div>
         </div>
       </div>
     </section>
   </div>
     `;
-  </script>
-<script>
-    const rootEl = document.documentElement;
-    const themeToggle = document.getElementById("themeToggle");
-    function setTheme(theme) {
-      rootEl.setAttribute("data-theme", theme);
-      localStorage.setItem("theme", theme);
-      themeToggle.textContent = `테마: ${theme === "light" ? "라이트" : "다크"}`;
-    }
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    setTheme(savedTheme);
-    themeToggle.onclick = () => {
-      const next = rootEl.getAttribute("data-theme") === "light" ? "dark" : "light";
-      setTheme(next);
-    };
   </script>
 </body>
 </html>

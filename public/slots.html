@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>슬롯 머신</title>
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --panel: #11151c;
+      --panel-2: #151b24;
+      --text: #f3f0e8;
+      --muted: #b7b0a3;
+      --accent: #d7b468;
+      --accent-2: #f3d290;
+      --border: rgba(220, 198, 140, 0.18);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      --glow: 0 0 36px rgba(215, 180, 104, 0.2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Playfair Display", "Noto Serif KR", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background:
+        radial-gradient(700px 400px at 15% -10%, rgba(215, 180, 104, 0.15), transparent),
+        radial-gradient(900px 600px at 85% -10%, rgba(255, 240, 200, 0.08), transparent),
+        linear-gradient(180deg, #0a0c10 0%, #0d1016 100%);
+      color: var(--text);
+    }
+    .wrap {
+      width: min(1200px, 100% - 32px);
+      margin: 0 auto;
+      padding: 20px 0;
+      display: grid;
+      gap: 16px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    h1 { margin: 0 0 6px 0; font-size: 26px; letter-spacing: 0.4px; }
+    .disclaimer {
+      background: linear-gradient(120deg, rgba(45, 32, 24, 0.9), rgba(55, 36, 26, 0.9));
+      color: #ffe8d6;
+      border: 1px solid rgba(245, 208, 122, 0.25);
+      padding: 10px 12px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+    }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .pill {
+      display: inline-block;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(17, 21, 28, 0.95), rgba(15, 18, 24, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    select, input, button {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+    button { cursor: pointer; font-weight: 700; }
+    button.primary {
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: #2a1c05;
+      border-color: rgba(215, 180, 104, 0.6);
+      box-shadow: var(--glow);
+    }
+    .slot-wrap {
+      position: relative;
+      width: max-content;
+      margin-top: 10px;
+    }
+    .slot-grid {
+      --cell: 70px;
+      --gap: 10px;
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, var(--cell));
+      gap: var(--gap);
+      z-index: 2;
+    }
+    .slot-cell {
+      width: 70px;
+      height: 70px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel-2);
+      font-size: 28px;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+    }
+    .slot-cell.win {
+      outline: 2px solid var(--accent-2);
+      box-shadow: 0 0 18px rgba(215, 180, 104, 0.35);
+    }
+    .slot-lines {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .status { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>슬롯 머신</h1>
+        <div class="disclaimer">본 서비스는 학습/게임 분석용이며, 도박/금전 조언이 아닙니다.</div>
+      </div>
+      <div class="row">
+        <a class="pill" href="index.html">메인</a>
+        <a class="pill" href="holdem.html">승률 계산기</a>
+        <a class="pill" href="minigames.html">미니게임</a>
+        <a class="pill" href="policy.html">정책/고지</a>
+      </div>
+    </div>
+
+    <section class="panel grid">
+      <div>
+        <h2><strong>슬롯</strong> (가상 포인트)</h2>
+        <div class="status">3x3 심볼에서 가로/세로/대각선 3개가 같으면 결과가 표시됩니다.</div>
+        <div class="row" style="margin-top:10px;">
+          <div class="status">보유 포인트: <strong id="slotBalance">1000</strong></div>
+          <label for="slotBet">라운드 포인트</label>
+          <input id="slotBet" type="number" min="10" step="10" value="20" />
+          <button class="primary" id="slotSpin">스핀</button>
+        </div>
+        <div class="slot-wrap" id="slotWrap">
+          <svg class="slot-lines" id="slotLines"></svg>
+          <div class="slot-grid" id="slotGrid">
+            <div class="slot-cell">🍒</div><div class="slot-cell">🍋</div><div class="slot-cell">🔔</div>
+            <div class="slot-cell">🍒</div><div class="slot-cell">🍋</div><div class="slot-cell">🔔</div>
+            <div class="slot-cell">🍒</div><div class="slot-cell">🍋</div><div class="slot-cell">🔔</div>
+          </div>
+        </div>
+        <div class="status" id="slotStatus" style="margin-top:10px;">가상 포인트 기반의 참고용 게임입니다.</div>
+      </div>
+      <div>
+        <h2><strong>규칙</strong></h2>
+        <div class="status">가로/세로/대각선 3개가 동일하면 해당 라인이 결과로 인정됩니다.</div>
+        <div class="status" style="margin-top:10px;">동일 라인이 여러 개이면 합산됩니다.</div>
+        <div class="status" style="margin-top:10px;">🍒 x2 / 🍋 x3 / 🔔 x5 / ⭐ x7 / 7️⃣ x12 (가상 포인트)</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const slotSymbols = ["🍒","🍋","🔔","⭐","7️⃣"];
+    const slotPay = { "🍒": 2, "🍋": 3, "🔔": 5, "⭐": 7, "7️⃣": 12 };
+    const slotBalanceEl = document.getElementById("slotBalance");
+    const slotBetEl = document.getElementById("slotBet");
+    const slotSpin = document.getElementById("slotSpin");
+    const slotWrap = document.getElementById("slotWrap");
+    const slotLines = document.getElementById("slotLines");
+    const slotGrid = Array.from(document.querySelectorAll(".slot-cell"));
+    const slotStatus = document.getElementById("slotStatus");
+    let balance = 1000;
+    let spinning = false;
+
+    function randSym() {
+      return slotSymbols[(Math.random()*slotSymbols.length)|0];
+    }
+    function renderBalance() { slotBalanceEl.textContent = balance; }
+    function resetLines() {
+      slotGrid.forEach(c => c.classList.remove("win"));
+      slotLines.innerHTML = "";
+    }
+    function centerOf(index) {
+      const gridStyle = getComputedStyle(document.getElementById("slotGrid"));
+      const cell = parseFloat(gridStyle.getPropertyValue("--cell")) || 70;
+      const gap = parseFloat(gridStyle.getPropertyValue("--gap")) || 10;
+      const r = Math.floor(index / 3);
+      const c = index % 3;
+      return {
+        x: c * (cell + gap) + cell / 2,
+        y: r * (cell + gap) + cell / 2
+      };
+    }
+    function drawLine(a, b) {
+      const gridStyle = getComputedStyle(document.getElementById("slotGrid"));
+      const cell = parseFloat(gridStyle.getPropertyValue("--cell")) || 70;
+      const gap = parseFloat(gridStyle.getPropertyValue("--gap")) || 10;
+      const size = cell * 3 + gap * 2;
+      slotLines.setAttribute("viewBox", `0 0 ${size} ${size}`);
+      slotLines.setAttribute("width", size);
+      slotLines.setAttribute("height", size);
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", a.x);
+      line.setAttribute("y1", a.y);
+      line.setAttribute("x2", b.x);
+      line.setAttribute("y2", b.y);
+      line.setAttribute("stroke", "#f3d290");
+      line.setAttribute("stroke-width", "4");
+      line.setAttribute("stroke-linecap", "round");
+      slotLines.appendChild(line);
+    }
+    function spin() {
+      if (spinning) return;
+      const bet = Math.max(10, Number(slotBetEl.value) || 0);
+      if (bet > balance) {
+        slotStatus.textContent = "라운드 포인트가 보유 포인트를 초과했습니다.";
+        return;
+      }
+      balance -= bet;
+      spinning = true;
+      slotStatus.textContent = "스핀 중...";
+      resetLines();
+      const start = Date.now();
+      const timer = setInterval(() => {
+        slotGrid.forEach(cell => cell.textContent = randSym());
+        if (Date.now() - start > 700) {
+          clearInterval(timer);
+          const g = slotGrid.map(c => c.textContent);
+          const lines = [
+            [0,1,2],[3,4,5],[6,7,8],
+            [0,3,6],[1,4,7],[2,5,8],
+            [0,4,8],[2,4,6]
+          ];
+          let total = 0;
+          let hitCount = 0;
+          for (const line of lines) {
+            const a = g[line[0]], b = g[line[1]], c = g[line[2]];
+            if (a === b && b === c) {
+              const mult = slotPay[a] || 2;
+              total += bet * mult;
+              hitCount++;
+              line.forEach(i => slotGrid[i].classList.add("win"));
+              drawLine(centerOf(line[0]), centerOf(line[2]));
+            }
+          }
+          if (total > 0) {
+            balance += total;
+            const label = hitCount > 1 ? `(${hitCount}개 라인)` : "";
+            slotStatus.textContent = `결과: +${total}포인트 ${label}`;
+          } else {
+            slotStatus.textContent = "결과: 불일치";
+          }
+          renderBalance();
+          spinning = false;
+        }
+      }, 80);
+    }
+    slotSpin.onclick = spin;
+    renderBalance();
+  </script>
+</body>
+</html>
